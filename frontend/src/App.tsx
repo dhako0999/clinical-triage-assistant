@@ -20,6 +20,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending_review" | "approved" | "rejected">("all");
+
+  const filteredQueries = queries.filter((query) => {
+    if (statusFilter === "all") {
+      return true;
+    } else {
+      return query.status === statusFilter;
+
+    }
+
+  });
+
+
   const totalQueries = queries.length;
 
   const pendingReviewCount = queries.filter((query) => query.status === "pending_review").length;
@@ -290,8 +303,43 @@ function App() {
 
       </section>
 
+
       <section className="query-section">
         <h2>Submitted Queries</h2>
+
+        <div className="query-filters">
+          <button
+                 type="button"
+                 className={statusFilter === "all" ? "filter-button active" : "filter-button"}
+                 onClick={() => setStatusFilter("all")}
+          >
+            All Queries
+          </button>
+
+          <button
+                 type="button"
+                 className={statusFilter === "pending_review" ? "filter-button active" : "filter-button"}
+                 onClick={() => setStatusFilter("pending_review")}
+          >
+            Pending Review
+          </button>
+
+          <button
+                 type="button"
+                 className={statusFilter === "approved" ? "filter-button active" : "filter-button"}
+                 onClick={() => setStatusFilter("approved")}
+          >
+            Approved
+          </button>
+
+          <button
+                 type="button"
+                 className={statusFilter === "rejected" ? "filter-button active" : "filter-button"}
+                 onClick={() => setStatusFilter("rejected")}
+          >
+            Rejected
+          </button>
+        </div>
 
         {isLoading && (
           <p>Loading queries...</p>
@@ -305,7 +353,12 @@ function App() {
           <p>No queries have been submitted yet.</p>
         )}
 
-        {!isLoading && !error && queries.map((query) => (
+        {!isLoading && !error && queries.length > 0 && filteredQueries.length === 0 && (
+          <p>No queries matched the selected filter.</p>
+
+        )}
+
+        {!isLoading && !error && filteredQueries.map((query) => (
           <article key={query.id} className="query-card">
             <div className="query-card-header">
               <h3>Site {query.site_id}</h3>

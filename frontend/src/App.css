@@ -282,3 +282,34 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Query filters */
+
+.query-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.query-filters .filter-button {
+  background-color: #FFFFFF;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 30px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.query-filters .filter-button:not(.active):hover {
+  background-color: #f1f5f9;
+}
+
+.query-filters .filter-button.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
