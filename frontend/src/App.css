@@ -49,12 +49,29 @@
 }
 
 .status-badge {
-  background: #eff6ff;
-  color: #1d4ed8;
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
+  display: inline-block;
+}
+
+/* Pending Review */
+.status-pending_review {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Approved */
+.status-approved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+/* Rejected */
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .query-details {
@@ -172,6 +189,51 @@
   background-color: #2563eb;
   color: white;
 }
+
+/* Approve the original AI response */
+
+.review-actions .approve-button {
+  background-color: #15803d;
+  color: #ffffff;
+}
+
+.review-actions .save-button {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.review-actions .reject-button {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.review-actions .cancel-button {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+/* Hover feedback */
+.review-actions .approve-button:hover:not(.disabled) {
+  background-color: #166534;
+}
+
+.review-actions .save-button:hover:not(.disabled) {
+  background-color: #1d4ed8;
+}
+
+.review-actions .reject-button:hover:not(.disabled) {
+  background-color: #b91c1c;
+}
+
+.review-actions .cancel-button:hover:not(.disabled) {
+  background-color: #d1d5db;
+}
+
+.review-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 
 .review-panel {
   display: flex;

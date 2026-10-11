@@ -271,7 +271,14 @@ function App() {
                     type="text"
                     placeholder="e.g. 042"
                     value={siteId}
-                    onChange={(e) => setSiteId(e.target.value)}
+                    onChange={(e) => {
+
+                      const value = e.target.value;
+
+                      if(/^\d*$/.test(value)) {
+                        setSiteId(e.target.value)
+                      }
+                    }}
                     className="form-field"
                     maxLength={50}
                     required
@@ -362,7 +369,7 @@ function App() {
           <article key={query.id} className="query-card">
             <div className="query-card-header">
               <h3>Site {query.site_id}</h3>
-              <span className="status-badge">{query.status.replaceAll("_", " ").replace(/^\b\w/g, (char) => char.toUpperCase())}</span>
+              <span className={`status-badge status-${query.status}`}>{query.status.replaceAll("_", " ").replace(/^\b\w/g, (char) => char.toUpperCase())}</span>
             </div>
 
             <p>{query.query_text}</p>
@@ -439,19 +446,19 @@ function App() {
 
 
                     <div className="review-actions">
-                      <button type="button" disabled={isReviewing} onClick={() => handleReview(query.id, "approve")}>
+                      <button type="button" className="approve-button" disabled={isReviewing} onClick={() => handleReview(query.id, "approve")}>
                         Approve Original
                       </button>
 
-                      <button type="button" disabled={isReviewing} onClick={() => handleReview(query.id, "edit")}>
+                      <button type="button" className="save-button" disabled={isReviewing} onClick={() => handleReview(query.id, "edit")}>
                         Save Edited Response
                       </button>
 
-                      <button type="button" disabled={isReviewing} onClick={() => handleReview(query.id, "reject")}>
+                      <button type="button" className="reject-button" disabled={isReviewing} onClick={() => handleReview(query.id, "reject")}>
                         Reject
                       </button>
 
-                      <button type="button" disabled={isReviewing} onClick={() => setReviewingQueryId(null)}>
+                      <button type="button" className="cancel-button" disabled={isReviewing} onClick={() => setReviewingQueryId(null)}>
                         Cancel
                       </button>
                     </div>

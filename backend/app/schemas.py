@@ -3,9 +3,12 @@ from typing import Literal
 
 
 class SiteQueryCreate(BaseModel):
-    site_id: str = Field(min_length=1, max_length=50)
+    site_id: str = Field(
+        min_length=1,
+        max_length=50,
+        pattern=r"^[0-9]+$"
+    )
     query_text: str = Field(min_length=1, max_length=5000)
-
 
 class ReviewActionCreate(BaseModel):
     reviewer_name: str = Field(min_length=1, max_length=100)

@@ -1,57 +1,53 @@
-Clinical Site Query Triage Assistant
+# Clinical Site Query Triage Assistant
 
 A full-stack AI-assisted application designed to help a fictional clinical operations team triage incoming study-site queries, identify potential safety concerns, route queries to the appropriate team, and prepare draft responses for human review.
 
 Built as a technical demonstration using React, TypeScript, FastAPI, PostgreSQL, and OpenAI.
 
-Features
+## Features
 
-AI classification: Categorizes incoming study-site queries as regulatory, safety, logistics, data query, or other.
+- **AI classification:** Categorizes incoming study-site queries as regulatory, safety, logistics, data query, or other.
+- **Escalation detection:** Determines whether a query requires human escalation.
+- **Team routing:** Assigns a responsible team based on the query.
+- **Draft response generation:** Uses an LLM to generate a proposed response.
+- **Human-in-the-loop review:** Allows reviewers to approve, edit and approve, or reject an AI-generated draft.
+- **Persistent storage:** Saves queries and review actions in PostgreSQL.
+- **Safety override:** Applies deterministic keyword-based escalation checks.
+- **Mock AI mode:** Supports triage without requiring OpenAI API access.
+- **Live dashboard metrics:** Displays total queries, pending reviews, escalations, and completed reviews.
+- **Query status filtering:** Filters queries by All, Pending Review, Approved, or Rejected.
 
-Escalation detection: Determines whether a query requires human escalation.
+## Screenshots
 
-Team routing: Assigns a responsible team based on the query.
+### Dashboard Overview
 
-Draft response generation: Uses an LLM to generate a proposed response.
+![Study-Site Dashboard](screenshots/dashboard-overview.png)
 
-Human-in-the-loop review: Allows reviewers to approve the original draft, edit and approve a response, or reject it.
+### Human Review Workflow
 
-Persistent storage: Saves queries and review actions in PostgreSQL.
+![Human Review and Safety Escalation](screenshots/human-review-workflow.png)
 
-Safety override: Applies a deterministic keyword-based check to escalate certain safety-related queries, even when the LLM classification is incorrect.
+## Technology Stack
 
-Mock AI mode: Supports deterministic triage without requiring OpenAI API access.
+### Frontend
+- React
+- TypeScript
+- Vite
+- CSS
 
-Technology Stack
+### Backend
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy
+- OpenAI API
 
-Frontend
+### Database
+- PostgreSQL (Supabase-hosted)
 
-React
+## Architecture
 
-TypeScript
-
-Vite
-
-CSS
-
-Backend
-
-Python
-
-FastAPI
-
-Pydantic
-
-SQLAlchemy
-
-OpenAI API
-
-Database
-
-PostgreSQL (Supabase-hosted)
-
-Architecture
-
+```text
 React + TypeScript Frontend
            |
            | HTTP / REST API
@@ -66,108 +62,129 @@ React + TypeScript Frontend
            +----> PostgreSQL Database
            |
            +----> Human Review Workflow
+```
 
 The frontend communicates with FastAPI through REST endpoints. The backend performs AI triage, applies a safety escalation rule, persists results, and processes reviewer decisions.
 
-Application Workflow
+## Application Workflow
 
-A user enters a study-site identifier and free-text query.
+1. A user enters a study-site identifier and free-text query.
 
-FastAPI sends the query to the configured AI triage service.
+2. FastAPI sends the query to the configured AI triage service.
 
-The AI returns a category, escalation decision, assigned team, and draft response.
+3. The AI returns a category, escalation decision, assigned team, and draft response.
 
-A deterministic safety check can override the classification and escalation decision.
+4. A deterministic safety check can override the classification and escalation decision.
 
-The query is stored in PostgreSQL with a pending_review status.
+5. The query is stored in PostgreSQL with a `pending_review` status.
 
-A human reviewer can approve the original response, edit and approve it, or reject it.
+6. A human reviewer can approve the original response, edit and approve it, or reject it.
 
-The review action is recorded, and the final approved response is available in the dashboard.
+7. The review action is recorded, and any approved final response is available in the dashboard.
 
-Important: This demonstration does not automatically send responses to study sites or notify assigned teams. Routing represents an internal assignment recommendation.
+**Important:** This demonstration does not automatically send responses to study sites or notify assigned teams. Routing represents an internal assignment recommendation.
 
-Running Locally
+## Running Locally
 
-Backend
+### Backend
 
 From the project root:
 
+```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-Create backend/.env using backend/.env.example as a template. Configure a PostgreSQL connection and choose an AI mode.
+Create `backend/.env` using `backend/.env.example` as a template. Configure a PostgreSQL connection and choose an AI mode.
 
+```dotenv
 DATABASE_URL=postgresql+psycopg://USERNAME:PASSWORD@HOST:5432/DATABASE
 AI_MODE=mock
 OPENAI_MODEL=gpt-4.1-mini
 OPENAI_API_KEY=your_openai_api_key_here
+```
 
-For OpenAI mode, set AI_MODE=openai and provide a valid API key.
+For OpenAI mode, set `AI_MODE=openai` and provide a valid API key.
 
-Start the backend:
+### Initialize the Database
 
+After configuring the PostgreSQL connection, create the database tables:
+
+```bash
+python init_db.py
+```
+
+This command creates missing tables defined by the SQLAlchemy models without deleting existing records. It does not perform schema migrations.
+
+### Start the Backend
+
+```bash
 uvicorn app.main:app --reload
+```
 
 Backend API: http://127.0.0.1:8000
 
 Interactive API documentation: http://127.0.0.1:8000/docs
 
-The backend requires an accessible PostgreSQL database with the application's tables initialized.
+### Frontend
 
-Frontend
+Open a second terminal from the project root and run:
 
-Open a second terminal and run:
-
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
 Open http://localhost:5173.
 
-Vite proxies requests beginning with /api to the FastAPI backend.
+Vite proxies requests beginning with `/api` to the FastAPI backend.
 
-REST API Endpoints
+## Testing
 
-Method
+The project includes automated backend tests covering AI triage behavior, safety escalation rules, and the human review workflow.
 
-Endpoint
+### Backend Tests
 
-Description
+From the `backend` directory, with the Python virtual environment activated:
 
-GET
+```bash
+python -m pytest tests/ -v
+```
 
-/api/health
+The current test suite includes eight tests covering:
 
-Check backend health
+- AI classification and mock triage behavior.
+- Safety keyword detection and escalation overrides.
+- Regression testing for safety keyword word boundaries.
+- Human review status transitions and duplicate-review prevention.
 
-POST
+The review workflow test uses an isolated SQLite test database rather than the production PostgreSQL database.
 
-/api/queries
+### Frontend Production Build
 
-Submit and triage a new query
+From the `frontend` directory:
 
-GET
+```bash
+npm run build
+```
 
-/api/queries
+This runs TypeScript build checks and generates optimized production assets using Vite.
 
-Retrieve queries and their final responses
 
-GET
+## REST API Endpoints
 
-/api/queries/{id}
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/health` | Check backend health |
+| POST | `/api/queries` | Submit and triage a new query |
+| GET | `/api/queries` | Retrieve submitted queries |
+| GET | `/api/queries/{id}` | Retrieve query details and review history |
+| POST | `/api/queries/{id}/review` | Approve, edit, or reject a draft |
 
-Retrieve query details and review history
-
-POST
-
-/api/queries/{id}/review
-
-Approve, edit, or reject a draft
-
-Safety and Human Oversight
+## Safety and Human Oversight
 
 The application is designed around human review rather than autonomous clinical decision-making.
 
@@ -183,7 +200,7 @@ The AI is instructed not to provide medical advice or claim that an action has a
 
 The keyword-based safety override is a demonstration safeguard, not a comprehensive clinical safety detection system. The application is not validated for real clinical operations or patient data.
 
-Reliability, Monitoring, and Model Drift
+## Reliability, Monitoring, and Model Drift
 
 In a production implementation, I would introduce:
 
@@ -201,9 +218,9 @@ Fallback handling: Return clear errors for AI or database failures and consider 
 
 The current demonstration includes basic error handling and persisted review actions. The monitoring and drift-detection capabilities above are proposed production enhancements, not fully implemented features.
 
-Production Considerations
+## Production Considerations
 
-Before deploying this system in a real clinical environment, additional work would be required:
+Before deploying a system like this in a real clinical environment, additional work would be required:
 
 Authentication and role-based access control
 
@@ -217,10 +234,10 @@ Comprehensive audit trails
 
 Observability and alerting
 
-Automated tests and deployment pipelines
+Expanded automated test coverage and CI/CD deployment pipelines
 
 Human-reviewed notification and response delivery integrations
 
-Project Scope
+## Project Scope
 
 This project demonstrates a working AI-assisted clinical query triage workflow with persistent storage and human oversight. It is intended for technical evaluation using fictional study-site data, not production clinical use.
