@@ -3,10 +3,12 @@ from pydantic import BaseModel
 
 
 import os
+import re
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from typing import Literal
+
 
 
 class TriageResult(BaseModel):
@@ -147,21 +149,25 @@ def enforce_safety_escalation(
     result: TriageResult
 ) -> TriageResult:
 
-   safety_keywords = [
-      "adverse event",
-      "serious adverse event",
-      "sae",
-      "patient safety",
-      "drug reaction",
-      "suspected unexpected serious adverse reaction",
-      "susar",
-   ]
+    safety_keywords = [
+        "adverse event",
+        "serious adverse event",
+        "sae",
+        "patient safety",
+        "drug reaction",
+        "suspected unexpected serious adverse reaction",
+        "susar",
+    ]
 
-   normalized_text = query_text.lower()
+    normalized_text = query_text.lower()
 
-   if any(keyword in normalized_text for keyword in safety_keywords):
-        result.category = "safety"
-        result.requires_escalation = True
-        result.assigned_team = "Drug Safety"
+    for keyword in safety_keywords:
+        pattern = r"\b" + re.escape(keyword) + r"\b"
 
-   return result
+        if re.search(pattern, normalized_text):
+            result.category = "safety"
+            result.requires_escalation = True
+            result.assigned_team = "Drug Safety"
+            break
+
+    return result
