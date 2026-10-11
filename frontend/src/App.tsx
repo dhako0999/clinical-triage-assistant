@@ -20,6 +20,14 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const totalQueries = queries.length;
+
+  const pendingReviewCount = queries.filter((query) => query.status === "pending_review").length;
+
+  const escalationCount = queries.filter((query) => query.requires_escalation === true).length;
+
+  const reviewedCount = queries.filter((query) => query.status === "approved" || query.status === "rejected").length;
+
   const [siteId, setSiteId] = useState("");
   const [queryText, setQueryText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -195,6 +203,49 @@ function App() {
         <h1>Study-Site Dashboard</h1>
         <p>Review and manage AI-triaged study-site requests.</p>
       </header>
+
+      <section className="stats-section" aria-label="Query-statistics">
+        <div className="stats-grid-section">
+          <div className="stat-card">
+            <p className="stat-label">
+              Total Queries
+            </p>
+            <h3 className="stat-count">{totalQueries}</h3>
+            <p className="stat-description">All submitted queries</p>
+          </div>
+
+          <div className="stat-card">
+            <p className="stat-label">
+              Pending Review
+            </p>
+            <h3>{pendingReviewCount}</h3>
+            <p className="stat-description">Awaiting human review</p>
+
+          </div>
+
+          <div className="stat-card">
+            <p className="stat-label">
+              Escalations
+            </p>
+            <h3>{escalationCount}</h3>
+            <p className="stat-description">Flagged for escalation</p>
+
+          </div>
+
+          <div className="stat-card">
+            <p className="stat-label">
+              Reviewed
+            </p>
+            <h3>{reviewedCount}</h3>
+            <p className="stat-description">Approved or rejected</p>
+
+          </div>
+        </div>
+
+
+
+
+      </section>
 
       <section className="form-section">
         <h2>Submit Study-Site Query</h2>
